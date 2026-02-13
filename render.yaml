@@ -6,7 +6,7 @@ services:
     plan: free
     autoDeploy: true
     buildCommand: cd feeder && npm ci
-    startCommand: node feeder/index.mjs
+    startCommand: node index.mjs
     healthCheckPath: /
     envVars:
       - key: SHARE_ACCOUNT_NAME      # z.B. +49...
