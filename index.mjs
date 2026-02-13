@@ -1,6 +1,6 @@
 import axios from "axios";
 import crypto from "node:crypto";
-import dotenv from "dotenv";
+import 'dotenv/config';
 dotenv.config();
 
 import express from "express";
