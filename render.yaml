@@ -1,13 +1,13 @@
 services:
-  - type: worker
-    name: ns-feeder-worker
+  - type: web
+    name: ns-feeder
     env: docker
     region: frankfurt
     autoDeploy: true
     plan: free        # zum Starten reicht free; später "starter" o. ä.
     dockerfilePath: ./Dockerfile
     runtime: docker
-    healthCheckPath: null
+    healthCheckPath: /
     envVars:
       - key: SHARE_ACCOUNT_NAME
         sync: false
