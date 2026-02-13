@@ -1,7 +1,6 @@
 import axios from "axios";
 import crypto from "node:crypto";
-import 'dotenv/config';
-dotenv.config();
+import "dotenv/config"; // lädt .env automatisch
 
 import express from "express";
 const app = express();
@@ -14,7 +13,9 @@ const cfg = {
   accountName: process.env.DEXCOM_ACCOUNT_NAME,            // z.B. +4917...
   password: process.env.DEXCOM_PASSWORD,
   host: process.env.DEXCOM_HOST || "shareous1.dexcom.com", // EU Host
-  applicationId: process.env.DEXCOM_APPLICATION_ID || "d89443d2-327c-4a6f-89e5-496bbb0317db",
+  applicationId:
+    process.env.DEXCOM_APPLICATION_ID ||
+    "d89443d2-327c-4a6f-89e5-496bbb0317db",
 
   nsUrl: process.env.NIGHTSCOUT_URL,
   nsApiSecret: process.env.NIGHTSCOUT_API_SECRET,
@@ -30,7 +31,8 @@ function requireVar(name, val) {
     throw new Error(`Missing env var: ${name}`);
   }
 }
-["DEXCOM_ACCOUNT_NAME","DEXCOM_PASSWORD","NIGHTSCOUT_URL","NIGHTSCOUT_API_SECRET"].forEach(n => requireVar(n, process.env[n]));
+["DEXCOM_ACCOUNT_NAME","DEXCOM_PASSWORD","NIGHTSCOUT_URL","NIGHTSCOUT_API_SECRET"]
+  .forEach(n => requireVar(n, process.env[n]));
 
 /** ---------- Hilfen ---------- */
 const dex = axios.create({
@@ -45,7 +47,6 @@ function sha1Hex(s) {
 
 // "Date(1770916027510+0100)" → { ms: 1770916027510, date: Date }
 function parseDexcomDate(str) {
-  // holt die erste Zahl nach "Date("
   const m = /Date\((\d+)/.exec(str);
   const ms = m ? Number(m[1]) : Date.now();
   return { ms, date: new Date(ms) };
@@ -53,18 +54,17 @@ function parseDexcomDate(str) {
 
 // Nightscout Entry aus Dexcom-Objekt
 function mapToNsEntry(d) {
-  // Dexcom Trend-Strings → Nightscout direction (best effort)
   const mapDir = {
-    "DoubleUp": "DoubleUp",
-    "SingleUp": "SingleUp",
-    "FortyFiveUp": "FortyFiveUp",
-    "Flat": "Flat",
-    "FortyFiveDown": "FortyFiveDown",
-    "SingleDown": "SingleDown",
-    "DoubleDown": "DoubleDown",
-    "None": "NONE",
-    "NotComputable": "NOT_COMPUTABLE",
-    "RateOutOfRange": "RATE_OUT_OF_RANGE"
+    DoubleUp: "DoubleUp",
+    SingleUp: "SingleUp",
+    FortyFiveUp: "FortyFiveUp",
+    Flat: "Flat",
+    FortyFiveDown: "FortyFiveDown",
+    SingleDown: "SingleDown",
+    DoubleDown: "DoubleDown",
+    None: "NONE",
+    NotComputable: "NOT_COMPUTABLE",
+    RateOutOfRange: "RATE_OUT_OF_RANGE",
   };
   const t = parseDexcomDate(d.DT || d.WT || d.ST);
   return {
@@ -73,13 +73,12 @@ function mapToNsEntry(d) {
     direction: mapDir[d.Trend] || "Flat",
     date: t.ms,
     dateString: new Date(t.ms).toISOString(),
-    // optional Felder:
     // device: "dexcom-share-feeder",
-    // rawbg: Number(d.Value)
+    // rawbg: Number(d.Value),
   };
 }
 
-/** ---------- Dexcom EU Flow (bewährt) ---------- */
+/** ---------- Dexcom EU Flow ---------- */
 // 1) AuthenticatePublisherAccount → accountId (UUID)
 async function authenticateByName(accountName, password) {
   const url = `/General/AuthenticatePublisherAccount?applicationId=${encodeURIComponent(cfg.applicationId)}`;
@@ -132,18 +131,14 @@ let lastSentMs = 0;
 
 async function tick() {
   try {
-    // 1+2: Session besorgen
     const accountId = await authenticateByName(cfg.accountName, cfg.password);
     const sessionId = await loginById(accountId, cfg.password);
 
-    // 3: Werte lesen
     const points = await readLatest(sessionId, cfg.minutes, cfg.maxCount);
 
-    // filtern (nur > lastSentMs)
     const mapped = points
       .map(mapToNsEntry)
       .filter(e => e.date > lastSentMs)
-      // sortieren alt→neu, damit Nightscout chronologisch bekommt
       .sort((a,b) => a.date - b.date);
 
     if (mapped.length) {
@@ -155,7 +150,6 @@ async function tick() {
       console.log("[feeder] no new entries");
     }
   } catch (err) {
-    // Dexcom Fehlermuster anzeigen (AccountPasswordInvalid etc.)
     if (err.response?.data) {
       console.error("[feeder] ERROR", err.response.status, err.response.data);
     } else {
