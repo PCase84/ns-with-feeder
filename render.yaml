@@ -1,0 +1,26 @@
+services:
+  - type: worker
+    name: ns-feeder-worker
+    env: docker
+    region: frankfurt
+    autoDeploy: true
+    plan: free        # zum Starten reicht free; später "starter" o. ä.
+    dockerfilePath: ./Dockerfile
+    runtime: docker
+    healthCheckPath: null
+    envVars:
+      - key: SHARE_ACCOUNT_NAME
+        sync: false
+      - key: SHARE_PASSWORD
+        sync: false
+      - key: CONNECT_SHARE_SERVER
+        value: shareous1.dexcom.com
+      - key: NIGHTSCOUT_URL
+        sync: false
+      - key: NIGHTSCOUT_API_SECRET
+        sync: false
+      # optional:
+      # - key: HISTORY_MINUTES
+      #   value: "1440"
+      # - key: MAX_COUNT
+      #   value: "288"
