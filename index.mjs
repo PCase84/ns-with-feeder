@@ -3,6 +3,12 @@ import crypto from "node:crypto";
 import dotenv from "dotenv";
 dotenv.config();
 
+import express from "express";
+const app = express();
+app.get("/", (_req, res) => res.send("ns-feeder up"));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`[feeder] http listening on :${PORT}`));
+
 /** ---------- Konfig ---------- */
 const cfg = {
   accountName: process.env.DEXCOM_ACCOUNT_NAME,            // z.B. +4917...
