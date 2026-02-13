@@ -5,7 +5,7 @@ services:
     region: frankfurt
     plan: free
     autoDeploy: true
-    buildCommand: cd feeder && npm ci
+    buildCommand: npm ci
     startCommand: node index.mjs
     healthCheckPath: /
     envVars:
