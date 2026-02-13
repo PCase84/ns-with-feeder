@@ -1,26 +1,25 @@
 services:
   - type: web
     name: ns-feeder
-    env: docker
+    env: node
     region: frankfurt
+    plan: free
     autoDeploy: true
-    plan: free        # zum Starten reicht free; später "starter" o. ä.
-    dockerfilePath: ./Dockerfile
-    runtime: docker
+    buildCommand: cd feeder && npm ci
+    startCommand: node feeder/index.mjs
     healthCheckPath: /
     envVars:
-      - key: SHARE_ACCOUNT_NAME
+      - key: SHARE_ACCOUNT_NAME      # z.B. +49...
         sync: false
       - key: SHARE_PASSWORD
         sync: false
-      - key: CONNECT_SHARE_SERVER
-        value: shareous1.dexcom.com
-      - key: NIGHTSCOUT_URL
+      - key: NIGHTSCOUT_URL          # https://dein-nightscout.onrender.com
         sync: false
       - key: NIGHTSCOUT_API_SECRET
         sync: false
-      # optional:
-      # - key: HISTORY_MINUTES
-      #   value: "1440"
-      # - key: MAX_COUNT
-      #   value: "288"
+      - key: CONNECT_SHARE_SERVER    # EU-Host
+        value: shareous1.dexcom.com
+      - key: POLL_MINUTES
+        value: "5"
+      - key: MAX_COUNT
+        value: "288"
