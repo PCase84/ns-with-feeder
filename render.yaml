@@ -9,11 +9,11 @@ services:
     startCommand: node index.mjs
     healthCheckPath: /
     envVars:
-      - key: SHARE_ACCOUNT_NAME      # z.B. +49...
+      - key: SHARE_ACCOUNT_NAME      # e.g. +4912345678...
         sync: false
       - key: SHARE_PASSWORD
         sync: false
-      - key: NIGHTSCOUT_URL          # https://dein-nightscout.onrender.com
+      - key: NIGHTSCOUT_URL          # https://your-nightscout.onrender.com
         sync: false
       - key: NIGHTSCOUT_API_SECRET
         sync: false
